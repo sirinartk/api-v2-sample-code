@@ -39,11 +39,13 @@ try:
 except Exception, e:
     print result.text()
     print "Couldn't decode the response as JSON:", e
+    exit()
 
 # -- Check that the server responded with a "200/Success" code
 if result.status_code != 200:
     print "ERROR: not a 200 result. instead got: %s." % result.status_code
     print json.dumps(result_json, indent=2)
+    exit()
 
 # -- Check the API request was successful
 if result_json.get('result', {}).get('code') != "success":
@@ -56,9 +58,10 @@ if result_json.get('result', {}).get('code') != "success":
 # -- print the entire json dump for reference
 print json.dumps(result_json, indent=2)
 
-# copy the `parse` data to a variable for easier use
+# -- Copy the `parses` data to a variable for easier use
 parses = result_json.get('parses')
 
+# -- Loop over each individual "parse" item in `parses`
 for parse_key in parses:
     
     # remember, the JSON will probably not be in the same order as you sent it,
@@ -71,6 +74,7 @@ for parse_key in parses:
     # an individual user agent parse (as is done in user_agent_parse.py). There
     # is a `result`, `parse` and possibly a `version_check`.
 
+    # -- Copy the data to some variables for easier use
     result = individual_parse.get('result')
     parse = individual_parse.get('parse')
     version_check = individual_parse.get('version_check')
@@ -122,15 +126,15 @@ for parse_key in parses:
 
     print "---------------------------------"
 
-# check the statistics
+# -- check the batch statistics
 parse_stats = result_json.get('parse_stats')
 
 if len(user_agents) != parse_stats.get('total'):
-    print "there was a mismatch in the number of user agents sent/returned."
-    # your request might have had duplicate keys in `user_agents`
+    print "There was a mismatch in the number of user agents sent/returned."
+    # Your request might have had duplicate keys in `user_agents`
 
 if parse_stats.get('error') > 0:
-    print "there was an error parsing %s of the user agents" % parse_stats.get('error')
-    # refer to the `result` key in the individual user agent parse results (inside `parses`) for more information
+    print "There was an error parsing %s of the user agents" % parse_stats.get('error')
+    # Refer to the `result` key in the individual user agent parse results (inside `parses`) for more information
 else:
-    print "There was no problem parsing any of those user agents"
+    print "All %s user agents were parsed" % parse_stats.get('success')

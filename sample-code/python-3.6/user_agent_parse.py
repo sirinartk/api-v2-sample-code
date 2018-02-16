@@ -25,11 +25,13 @@ try:
 except Exception as e:
     print(result.text())
     print("Couldn't decode the response as JSON:", e)
+    exit()
 
 # -- Check that the server responded with a "200/Success" code
 if result.status_code != 200:
     print("ERROR: not a 200 result. instead got: %s." % result.status_code)
     print(json.dumps(result_json, indent=2))
+    exit()
 
 # -- Check the API request was successful
 if result_json.get('result', {}).get('code') != "success":
@@ -42,7 +44,7 @@ if result_json.get('result', {}).get('code') != "success":
 # -- print the entire json dump for reference
 print(json.dumps(result_json, indent=2))
 
-# copy the `parse` data to a variable for easier use
+# -- Copy the data to some variables for easier use
 parse = result_json.get('parse')
 version_check = result_json.get('version_check')
 
